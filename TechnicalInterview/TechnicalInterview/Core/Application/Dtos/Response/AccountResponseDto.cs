@@ -1,6 +1,6 @@
-﻿namespace TechnicalInterview.Core.Application.Dtos
+﻿namespace TechnicalInterview.Core.Application.Dtos.Response
 {
-    public class AccountDto
+    public class AccountResponseDto
     {
         public string AccountId { get; set; } = default!;
         public decimal Balance { get; set; }

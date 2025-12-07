@@ -1,16 +1,6 @@
 # TechnicalInterviewEduardo
-Prueba Tecnica Multimoney Eduard Cabrera
+Prueba Tecnica Multimoney Eduard Cabrera Sandi
 
-## Adiciones al a arquitectura
-** \Core\Application\Dtos\Request**
-** \Core\Application\Dtos\Response**
--La intencion es segregar aun mas el uso de cada Dto y manter orden
+## :hammer: Ajustes en la arquitectura
+- 'WebAPI/Dtos': Se crea con con el fin de separar los DTO que exponen/reciben informacion del/al api, de los DTO de la capa de aplicacion, de esta forma se logra un mejor desacople enntre capas
 
-
-** \Infrastructure\SpResults\**
-
-Esta carpeta contiene objetos que representan los resultados de los Stored Procedures (SP) que ejecutan comandos
-
-- Cada clase encapsula los parámetros de salida de un SP específico.  
-- No son entidades de dominio ni DTOs de presentación.  
-- Su proposito es transportar datos crudos desde la capa de infraestructura hacia la capa de Application

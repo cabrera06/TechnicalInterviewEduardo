@@ -37,6 +37,11 @@ namespace TechnicalInterview.Core.Application.Services.Transfers.Commands
             {
                 throw new ValidationException("El monto de la tranferencia debe ser mayor a cero");
             }
+
+            if (request.FromAccountId== request.ToAccountId)
+            {
+                throw new ValidationException("La cuenta de origen y la cuenta destino no pueden ser la misma");
+            }
             var transfer = await _transferRepository.ExecuteTransfer(request.FromAccountId, request.ToAccountId, request.Amount, request.Description, cancellationToken);
 
             if (transfer is null)

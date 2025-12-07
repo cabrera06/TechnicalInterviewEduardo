@@ -24,7 +24,7 @@ namespace TechnicalInterview.Controllers.v1
                 var query = new GetAccountInfoQuery(accountId);
                 var resp = await Mediator.Send(query);
                 if (resp is null) return NotFound(ApiResponse<object>.Fail("No se encontro la cuenta"));
-                return Ok(ApiResponse<AccountResponse>.Success(resp));
+                return Ok(ApiResponse<AccountResponse>.Success(resp,"Cuenta consultada con exito"));
             }
             catch (ValidationException ex)
             {
@@ -44,7 +44,7 @@ namespace TechnicalInterview.Controllers.v1
                 var command = new CreateDepositCommand(accountId, request.Amount, request.Description);
                 var resp = await Mediator.Send(command);
 
-                return Ok(ApiResponse<DepositResponse>.Success(resp));
+                return Ok(ApiResponse<DepositResponse>.Success(resp,"Deposito realizado con exito"));
             }
             catch (ValidationException ex)
             {
@@ -63,7 +63,7 @@ namespace TechnicalInterview.Controllers.v1
             {
                 var command = new CreateWithdrawalCommand(accountId, request.Amount, request.Description);
                 var resp = await Mediator.Send(command);
-                return Ok(ApiResponse<WithdrawalResponse>.Success(resp));
+                return Ok(ApiResponse<WithdrawalResponse>.Success(resp,"Retiro realizado con exito"));
             }
             catch (ValidationException ex)
             {

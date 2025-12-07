@@ -12,6 +12,7 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Pr
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<TechnicalInterview.Core.Application.Mappings.AccountProfile>();
+    cfg.AddProfile<TechnicalInterview.Core.Application.Mappings.TransferProfile>();
 });
 builder.Services.AddInfrastructure(builder.Configuration);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

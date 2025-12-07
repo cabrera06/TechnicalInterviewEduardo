@@ -1,6 +1,6 @@
-﻿namespace TechnicalInterview.Core.Application.Dtos.Request
+﻿namespace TechnicalInterview.WebAPI.Dtos.Request
 {
-    public class DepositRequestDto
+    public class DepositRequest
     {
         public decimal Amount { get; set; }
         public string Description { get; set; } = default!;

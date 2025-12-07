@@ -1,4 +1,4 @@
-﻿namespace TechnicalInterview.Core.Application.Dtos.Response
+﻿namespace TechnicalInterview.WebAPI.Dtos.Response
 {
     public class ApiResponse<T>
     {

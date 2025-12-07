@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using MediatR;
-using TechnicalInterview.Core.Application.Dtos.Response;
+using System.ComponentModel.DataAnnotations;
 using TechnicalInterview.Core.Domain.Interfaces.Repositories;
+using TechnicalInterview.WebAPI.Dtos.Response;
 
 namespace TechnicalInterview.Core.Application.Services.Accounts.Commands
 {
-    public class CreateDepositCommand : IRequest<DepositResponseDto>
+    public class CreateDepositCommand : IRequest<DepositResponse>
     {
         public string AccountId { get; set; } = default!;
         public decimal Amount { get; set; }
@@ -20,7 +21,7 @@ namespace TechnicalInterview.Core.Application.Services.Accounts.Commands
         }
     }
 
-    public class CreateDepositHandler : IRequestHandler<CreateDepositCommand, DepositResponseDto>
+    public class CreateDepositHandler : IRequestHandler<CreateDepositCommand, DepositResponse>
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IMapper _mapper;
@@ -29,19 +30,28 @@ namespace TechnicalInterview.Core.Application.Services.Accounts.Commands
             _accountRepository = accountRepository;
             _mapper = mapper;
         }
-        public async Task<DepositResponseDto> Handle(CreateDepositCommand request, CancellationToken cancellationToken)
+        public async Task<DepositResponse> Handle(CreateDepositCommand request, CancellationToken cancellationToken)
         {
-            var deposit = await _accountRepository.CreateDeposit(request.AccountId, request.Amount, request.Description, cancellationToken);
 
+            if (request.Amount <= 0)
+            {
+                throw new ValidationException("El monto a depositar debe ser mayor a cero");
+            }
+
+            var deposit = await _accountRepository.CreateDeposit(request.AccountId, request.Amount, request.Description, cancellationToken);
+            
             if (deposit is null)
             {
-                return new DepositResponseDto
-                {
-                    ErrorCode = -1,
-                    ErrorMessage= "No se logro btener informacion de deposito",
-                };
-             }
-            return _mapper.Map<DepositResponseDto>(deposit);
+                throw new ValidationException("No se logro recuperar informacion del deposito creado");
+            }
+
+            if (deposit.Success ==false)
+            {
+                throw new ValidationException(deposit.Message);
+            }
+
+
+            return _mapper.Map<DepositResponse>(deposit);
 
         }
     }

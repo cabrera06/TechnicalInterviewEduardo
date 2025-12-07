@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using Azure;
 using MediatR;
-using TechnicalInterview.Core.Application.Dtos.Response;
+using System.ComponentModel.DataAnnotations;
 using TechnicalInterview.Core.Domain.Interfaces.Repositories;
+using TechnicalInterview.WebAPI.Dtos.Response;
 
 namespace TechnicalInterview.Core.Application.Services.Accounts.Queries
 {
-    public class GetAccountInfoQuery : IRequest<AccountResponseDto?>
+    public class GetAccountInfoQuery : IRequest<AccountResponse?>
     {
         public string AccountId { get; set; } = default!;
 
@@ -17,7 +18,7 @@ namespace TechnicalInterview.Core.Application.Services.Accounts.Queries
     }
 
 
-    public class GetAccountInfoHandler : IRequestHandler<GetAccountInfoQuery, AccountResponseDto?>
+    public class GetAccountInfoHandler : IRequestHandler<GetAccountInfoQuery, AccountResponse?>
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IMapper _mapper;
@@ -28,12 +29,16 @@ namespace TechnicalInterview.Core.Application.Services.Accounts.Queries
             _mapper = mapper;
         }
 
-        public async Task<AccountResponseDto?> Handle(GetAccountInfoQuery request, CancellationToken cancellationToken)
+        public async Task<AccountResponse?> Handle(GetAccountInfoQuery request, CancellationToken cancellationToken)
         {
             var account = await _accountRepository.GetAccountInfo(request.AccountId, cancellationToken);
-            if (account == null) return null;
-
-            var accountDto = _mapper.Map<AccountResponseDto?>(account);
+    
+            if (account is null)
+            {
+                throw new ValidationException("La Cuenta indicada no existe");
+            }
+            
+            var accountDto = _mapper.Map<AccountResponse?>(account);
             return accountDto;
 
         }

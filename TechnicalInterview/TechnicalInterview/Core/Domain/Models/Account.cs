@@ -8,6 +8,6 @@
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
 
-        public List<Transaction> TransactionsList { get; set; } = [];
+        public List<Transaction> Transactions { get; set; } = [];
     }
 }

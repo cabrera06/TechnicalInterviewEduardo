@@ -8,7 +8,7 @@ namespace TechnicalInterview.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IAccountRepository, AccountRepository>();
-           // services.AddScoped<ITransferRepository, TransactionRepository>();
+            services.AddScoped<ITransferRepository, TransferRepository>();
             return services;
         }
     }

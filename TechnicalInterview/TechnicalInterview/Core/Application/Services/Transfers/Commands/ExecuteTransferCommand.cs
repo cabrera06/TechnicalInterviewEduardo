@@ -1,13 +1,15 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.VisualBasic;
 using System.ComponentModel.DataAnnotations;
+using TechnicalInterview.Core.Application.Dtos;
 using TechnicalInterview.Core.Domain.Interfaces.Repositories;
 using TechnicalInterview.Infrastructure.Repositories;
 using TechnicalInterview.WebAPI.Dtos.Response;
 
 namespace TechnicalInterview.Core.Application.Services.Transfers.Commands
 {
-    public class ExecuteTransferCommand : IRequest<TransferResponse>
+    public class ExecuteTransferCommand : IRequest<ApiResponse<TransferResponse>>
     {
         public string FromAccountId { get; set; } = default!;
         public string ToAccountId { get; set; } = default!;
@@ -22,7 +24,7 @@ namespace TechnicalInterview.Core.Application.Services.Transfers.Commands
         }
     }
 
-    public class ExecuteTransferHandler : IRequestHandler<ExecuteTransferCommand, TransferResponse>
+    public class ExecuteTransferHandler : IRequestHandler<ExecuteTransferCommand, ApiResponse<TransferResponse>>
     {
         private readonly ITransferRepository _transferRepository;
         private readonly IMapper _mapper;
@@ -31,22 +33,22 @@ namespace TechnicalInterview.Core.Application.Services.Transfers.Commands
             _transferRepository = transferRepository;
             _mapper = mapper;
         }
-        public async Task<TransferResponse> Handle(ExecuteTransferCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponse<TransferResponse>> Handle(ExecuteTransferCommand request, CancellationToken cancellationToken)
         {
             if (request.Amount <= 0)
             {
-                throw new ValidationException("El monto de la tranferencia debe ser mayor a cero");
+                return ApiResponse<TransferResponse>.Fail("El monto de la tranferencia debe ser mayor a cero", new List<string> { "El valor del campo amount debe ser mayor a cero" });
             }
 
             if (request.FromAccountId== request.ToAccountId)
             {
-                throw new ValidationException("La cuenta de origen y la cuenta destino no pueden ser la misma");
+                return ApiResponse<TransferResponse>.Fail("La cuenta de origen y la cuenta destino no pueden ser la misma", new List<string> { "Los valores de los campo fromAccountId y toAccountId deben ser diferentes" });
             }
             var transfer = await _transferRepository.ExecuteTransfer(request.FromAccountId, request.ToAccountId, request.Amount, request.Description, cancellationToken);
 
             if (transfer is null)
             {
-                throw new ValidationException("No se logro recuperar informacion del deposito creado");
+                return ApiResponse<TransferResponse>.Fail("No se logro recuperar informacion del deposito creado");
             }
 
             if (transfer.Success == false)
@@ -54,8 +56,8 @@ namespace TechnicalInterview.Core.Application.Services.Transfers.Commands
                 throw new ValidationException(transfer.Message);
             }
 
-
-            return _mapper.Map<TransferResponse>(transfer);
+            var result= _mapper.Map<TransferResponse>(transfer);
+            return ApiResponse<TransferResponse>.Success(result!, transfer.Message);
         }
     }
 }

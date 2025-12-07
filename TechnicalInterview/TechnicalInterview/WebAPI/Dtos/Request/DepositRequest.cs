@@ -1,4 +1,6 @@
-﻿namespace TechnicalInterview.WebAPI.Dtos.Request
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TechnicalInterview.WebAPI.Dtos.Request
 {
     public class DepositRequest
     {

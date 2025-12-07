@@ -7,7 +7,7 @@ using TechnicalInterview.WebAPI.Dtos.Response;
 
 namespace TechnicalInterview.Core.Application.Services.Accounts.Commands
 {
-    public class CreateWithdrawalCommand : IRequest<WithdrawalResponse>
+    public class CreateWithdrawalCommand : IRequest<ApiResponse<WithdrawalResponse>>
     {
         public string AccountId { get; set; } = default!;
         public decimal Amount { get; set; }
@@ -20,7 +20,7 @@ namespace TechnicalInterview.Core.Application.Services.Accounts.Commands
         }
 
     }
-    public class withdrawalHandler : IRequestHandler<CreateWithdrawalCommand, WithdrawalResponse>
+    public class withdrawalHandler : IRequestHandler<CreateWithdrawalCommand, ApiResponse<WithdrawalResponse>>
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IMapper _mapper;
@@ -29,23 +29,24 @@ namespace TechnicalInterview.Core.Application.Services.Accounts.Commands
             _accountRepository = accountRepository;
             _mapper = mapper;
         }
-        public async Task<WithdrawalResponse> Handle(CreateWithdrawalCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponse<WithdrawalResponse>> Handle(CreateWithdrawalCommand request, CancellationToken cancellationToken)
         {
             if (request.Amount <= 0)
             {
-                throw new ValidationException("El monto a retirar debe ser mayor a cero");
+                return ApiResponse<WithdrawalResponse>.Fail("El monto a retirar debe ser mayor a cero", new List<string> { "El valor del campo amount debe ser mayor a cero" });
             }
             var withdrawal = await _accountRepository.CreateWithdrawal(request.AccountId, request.Amount, request.Description, cancellationToken);
             if (withdrawal is null)
             {
-                throw new ValidationException("No se logro recuperar informacion del retiro creado");
+                return ApiResponse<WithdrawalResponse>.Fail("No se logro recuperar informacion del retiro creado");
             }
             if (withdrawal.Success == false)
             {
-                throw new ValidationException(withdrawal.Message);
+                return ApiResponse<WithdrawalResponse>.Fail("Error controlado", new List<string> { withdrawal.Message });
             }
 
-            return _mapper.Map<WithdrawalResponse>(withdrawal);
+            var result =_mapper.Map<WithdrawalResponse>(withdrawal);
+            return ApiResponse<WithdrawalResponse>.Success(result, withdrawal.Message);
 
         }
     }

@@ -7,7 +7,7 @@ using TechnicalInterview.WebAPI.Dtos.Response;
 
 namespace TechnicalInterview.Core.Application.Services.Accounts.Queries
 {
-    public class GetAccountInfoQuery : IRequest<AccountResponse?>
+    public class GetAccountInfoQuery : IRequest<ApiResponse<AccountResponse>?>
     {
         public string AccountId { get; set; } = default!;
 
@@ -18,7 +18,7 @@ namespace TechnicalInterview.Core.Application.Services.Accounts.Queries
     }
 
 
-    public class GetAccountInfoHandler : IRequestHandler<GetAccountInfoQuery, AccountResponse?>
+    public class GetAccountInfoHandler : IRequestHandler<GetAccountInfoQuery, ApiResponse<AccountResponse>>
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IMapper _mapper;
@@ -29,17 +29,17 @@ namespace TechnicalInterview.Core.Application.Services.Accounts.Queries
             _mapper = mapper;
         }
 
-        public async Task<AccountResponse?> Handle(GetAccountInfoQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponse<AccountResponse>?> Handle(GetAccountInfoQuery request, CancellationToken cancellationToken)
         {
             var account = await _accountRepository.GetAccountInfo(request.AccountId, cancellationToken);
     
             if (account is null)
             {
-                throw new ValidationException("La Cuenta indicada no existe");
+                return ApiResponse<AccountResponse>.Fail("La Cuenta indicada no existe", new List<string> { "La cuenta "+ request.AccountId+" no existe" });
             }
             
             var accountDto = _mapper.Map<AccountResponse?>(account);
-            return accountDto;
+            return ApiResponse<AccountResponse>.Success(accountDto!, "Consulta Exitosa");
 
         }
     }

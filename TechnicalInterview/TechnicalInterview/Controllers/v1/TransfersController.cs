@@ -19,8 +19,12 @@ namespace TechnicalInterview.Controllers.v1
             try
             {
                 var command = new ExecuteTransferCommand(request.FromAccountId, request.ToAccountId, request.Amount, request.Description);
-                var resp = await Mediator.Send(command);
-                return Ok(ApiResponse<TransferResponse>.Success(resp,"Transferencia realizada con exito"));
+                var result = await Mediator.Send(command);
+                if (!result.Succeeded)
+                    return BadRequest(result);
+
+
+                return Ok(result);
             }
             catch (ValidationException ex)
             {

@@ -6,7 +6,7 @@ using TechnicalInterview.WebAPI.Dtos.Response;
 
 namespace TechnicalInterview.Core.Application.Services.Accounts.Commands
 {
-    public class CreateDepositCommand : IRequest<DepositResponse>
+    public class CreateDepositCommand : IRequest<ApiResponse<DepositResponse>>
     {
         public string AccountId { get; set; } = default!;
         public decimal Amount { get; set; }
@@ -21,7 +21,7 @@ namespace TechnicalInterview.Core.Application.Services.Accounts.Commands
         }
     }
 
-    public class CreateDepositHandler : IRequestHandler<CreateDepositCommand, DepositResponse>
+    public class CreateDepositHandler : IRequestHandler<CreateDepositCommand, ApiResponse<DepositResponse>>
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IMapper _mapper;
@@ -30,28 +30,29 @@ namespace TechnicalInterview.Core.Application.Services.Accounts.Commands
             _accountRepository = accountRepository;
             _mapper = mapper;
         }
-        public async Task<DepositResponse> Handle(CreateDepositCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponse<DepositResponse>> Handle(CreateDepositCommand request, CancellationToken cancellationToken)
         {
 
             if (request.Amount <= 0)
             {
-                throw new ValidationException("El monto a depositar debe ser mayor a cero");
+                return ApiResponse<DepositResponse>.Fail("El monto a depositar debe ser mayor a cero", new List<string> { "El valor del campo Amount debe ser mayor a cero" });
             }
 
             var deposit = await _accountRepository.CreateDeposit(request.AccountId, request.Amount, request.Description, cancellationToken);
             
             if (deposit is null)
             {
-                throw new ValidationException("No se logro recuperar informacion del deposito creado");
+                return ApiResponse<DepositResponse>.Fail("No se logro recuperar informacion del deposito creado");
             }
+        
 
             if (deposit.Success ==false)
             {
-                throw new ValidationException(deposit.Message);
+                return ApiResponse<DepositResponse>.Fail("Error controlado", new List<string> { deposit.Message });
             }
 
-
-            return _mapper.Map<DepositResponse>(deposit);
+            var result = _mapper.Map<DepositResponse>(deposit);
+            return ApiResponse<DepositResponse>.Success(result, deposit.Message);
 
         }
     }

@@ -14,9 +14,6 @@ namespace TechnicalInterview.WebAPI.Validators
             RuleFor(x => x.ToAccountId)
             .NotEmpty().WithMessage("El parametro toAccountId es obligatorio")
             .Must(id => !string.IsNullOrWhiteSpace(id) && !id.Contains(" ")).WithMessage("El parámetro toAccountId no debe contener espacios");
-
-            RuleFor(x => x.Amount)
-            .NotEmpty().WithMessage("El parametro amount es obligatorio");
         }
     }
 }

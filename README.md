@@ -46,7 +46,7 @@ Ubicados en `/Database`:
 ```
 
 ### 2. Actualizar cadena de conexión
-En `appsettings.json`:
+En `appsettings.json`: Se debe ajustar el nombre del server segun sea necesario
 ```json
 "ConnectionStrings": {
   "DefaultConnection": "Server=.;Database=TechnicalInterviewDb;Trusted_Connection=True;"
